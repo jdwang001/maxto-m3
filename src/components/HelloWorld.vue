@@ -3,16 +3,24 @@
     <h1>{{ msg }}</h1>
       <el-row :gutter="10"> 
         <div v-for='(item,index) in playerOptions' :key='index'>
-          <el-col :span="6">
-            <div class="grid-content bg-purple-light">
-              <el-row>
-                <video-player  class="video-player vjs-custom-skin"
-                ref="videoPlayer"
-                :playsinline="true"
-                :options="playerOptions[index]"
-                ></video-player>
-              </el-row>
-            </div>
+          <el-col :span="24">
+              <div class="grid-content bg-purple-light">
+                <el-row>
+                  <!-- <video-player  class="video-player vjs-custom-skin"
+                  ref="videoPlayer"
+                  :playsinline="true"
+                  :options="playerOptions[index]"
+                  customEventName="changed"
+                  @changed="playerStateChanged($event)"
+                  ></video-player> -->
+                  <video-player id = 'index' class="video-player vjs-custom-skin vjs-big-play-centered"
+                  ref="videoPlayer"
+                  :playsinline="true"
+                  :options="playerOptions[index]"
+                  @changed="wzd($event)"
+                  ></video-player>                  
+                </el-row>
+              </div>
           </el-col>
         </div>
       </el-row>
@@ -79,7 +87,10 @@ export default {
     videoPlayer
   },
   methods:{
-    wzd(){
+    playerStateChanged(playerCurrentState){
+      console.log('event info is ',playerCurrentState)
+    },
+    wzd(playevent){
       console.log('clicked wzd ')
     },
     getVideo(){
@@ -99,6 +110,10 @@ export default {
             videoplayerinfo['sources'] = {'type':'video/mp4','src':serurl+element.FPATH.split(':')[1],'videoname':element.NAME}
             this.playerOptions.push(videoplayerinfo)
           }
+          //test
+          var vidtestinfo = this.getplayerinfo()
+          vidtestinfo['sources'] = {'type':'video/mp4','src':'http://localhost:8000/679a0c7eb9583bf6aaf04d4121ce789b.mp4','videoname':'M3蓝牙耳机'}
+          this.playerOptions.push(vidtestinfo)
           console.log(JSON.stringify(this.playerOptions))
         }
       ).catch( res => {
@@ -180,5 +195,38 @@ a {
 .row-bg {
   padding: 10px 0;
   background-color: #f9fafc;
+}
+.el-header, .el-footer {
+  background-color: #B3C0D1;
+  color: #333;
+  text-align: center;
+  line-height: 60px;
+}
+
+.el-aside {
+  background-color: #D3DCE6;
+  color: #333;
+  text-align: center;
+  line-height: 200px;
+}
+
+.el-main {
+  background-color: #E9EEF3;
+  color: #333;
+  text-align: center;
+  line-height: 160px;
+}
+
+body > .el-container {
+  margin-bottom: 40px;
+}
+
+.el-container:nth-child(5) .el-aside,
+.el-container:nth-child(6) .el-aside {
+  line-height: 260px;
+}
+
+.el-container:nth-child(7) .el-aside {
+  line-height: 320px;
 }
 </style>
