@@ -25,7 +25,7 @@
         </div>
       </el-row>
     
-    <button @click="wzd"></button>
+    <!-- <button @click="wzd"></button> -->
   </div>
 </template>
 
@@ -41,6 +41,7 @@ export default {
   data () {
     return {
       msg: 'Maxto M3',
+      timer: '',
       videoInfos: [],
       playerOptions:[],
       videoOption : {
@@ -72,21 +73,30 @@ export default {
         }
     }    
   },
-    mounted() {
-      this.getVideo()
-      var x2json = new x2js()
-      var xmlText = "<MyRoot><test>Success</test><test2><item>val1</item><item>val2</item></test2></MyRoot>";
-      var jsonObj =  x2json.xml2js( xmlText )
-      console.log('jsonobg ',jsonObj)
-      console.log('this is current player instance object', this.videoPlayer)
-      setTimeout(() => {
-        console.log('dynamic change options')
-      }, 1000)
-    },  
+  mounted() {
+    this.getVideo()
+    var x2json = new x2js()
+    var xmlText = "<MyRoot><test>Success</test><test2><item>val1</item><item>val2</item></test2></MyRoot>";
+    var jsonObj =  x2json.xml2js( xmlText )
+    console.log('jsonobg ',jsonObj)
+    console.log('this is current player instance object', this.videoPlayer)
+    setTimeout(() => {
+      console.log('dynamic change options')
+    }, 1000)
+    this.timer = setInterval(this.m3heartbeat,5000)
+  },
+  beforeDestroy() {
+      clearInterval(this.timer);
+  },
   components: {
     videoPlayer
   },
   methods:{
+    m3heartbeat(){
+      // 感觉抓包的时候,这个显示的是心跳请求
+      console.log('heartbeat is ok')
+      this.axios.get('/?custom=1&cmd=3016')
+    },
     playerStateChanged(playerCurrentState){
       console.log('event info is ',playerCurrentState)
     },
@@ -94,7 +104,12 @@ export default {
       console.log('clicked wzd ')
     },
     getVideo(){
-      this.axios.get('http://0.0.0.0:8000/%E4%B8%8B%E8%BD%BD.xml')
+      // /Users/aurora/Desktop/下载.xml 文件 为本地保存的文件 便于调试 
+      // 另外由于使用node的代理,来进行请求操作
+      // 其中 npm run dev 直接请求本地的/Users/aurora/Desktop/下载.xml  
+      // npm run build 编译的文件直接会代理到m3 并且需要更改为请求命令this.axios.get('/?custom=1&cmd=3015')
+      //我觉得基本说清楚了
+      this.axios.get('%E4%B8%8B%E8%BD%BD.xml')
       // this.axios.get('/?custom=1&cmd=3015')
       .then( res => {
           console.log("right is ",res)
