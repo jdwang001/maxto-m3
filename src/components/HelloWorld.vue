@@ -1,30 +1,129 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-      <el-row :gutter="10"> 
-        <div v-for='(item,index) in playerOptions' :key='index'>
-          <el-col :span="24">
-              <div class="grid-content bg-purple-light">
-                <el-row>
-                  <!-- <video-player  class="video-player vjs-custom-skin"
-                  ref="videoPlayer"
-                  :playsinline="true"
-                  :options="playerOptions[index]"
-                  customEventName="changed"
-                  @changed="playerStateChanged($event)"
-                  ></video-player> -->
-                  <video-player id = 'index' class="video-player vjs-custom-skin vjs-big-play-centered"
-                  ref="videoPlayer"
-                  :playsinline="true"
-                  :options="playerOptions[index]"
-                  @changed="wzd($event)"
-                  ></video-player>                  
-                </el-row>
-              </div>
-          </el-col>
+    <!-- <el-avatar>user</el-avatar> -->
+    <el-tabs type="border-card" v-model="activeName" @tab-click="handleClick">
+      <el-tab-pane label="我的视频" name='myvideo'>
+        <span slot="label"><i class="el-icon-video-camera"></i> 我的视频</span>
+          <el-row :gutter="10"> 
+            <div v-for='(item,index) in playerOptions' :key='index'>
+              <el-col :span="24">
+                <div class="grid-content bg-purple-light">
+                  <el-row>
+                    <!-- <video-player  class="video-player vjs-custom-skin"
+                    ref="videoPlayer"
+                    :playsinline="true"
+                    :options="playerOptions[index]"
+                    customEventName="changed"
+                    @changed="playerStateChanged($event)"
+                    ></video-player> -->
+                    <video-player id = 'index' class="video-player vjs-custom-skin vjs-big-play-centered"
+                    ref="videoPlayer"
+                    :playsinline="true"
+                    :options="playerOptions[index]"
+                    @changed="wzd($event)"
+                    ></video-player>                  
+                  </el-row>
+                </div>
+              </el-col>
+            </div>
+          </el-row>
+      </el-tab-pane>
+      <el-tab-pane label="配置管理" name="configmanage">
+        <span slot="label"><i class="el-icon-s-tools"></i> 配置管理</span>
+        <div style="text-align: left;">
+          <div style="margin-top: 20px">
+            <el-radio-group v-model="configInfo.phonesize" @change="setconfig">
+              <el-radio-button label="照片质量" disabled></el-radio-button>
+              <el-radio-button label="1002_0">12M</el-radio-button>
+              <el-radio-button label="1002_1">10M</el-radio-button>
+              <el-radio-button label="1002_2">8M</el-radio-button>
+              <el-radio-button label="1002_3">5M</el-radio-button>
+              <el-radio-button label="1002_4">3M</el-radio-button>
+              <!-- <el-radio-button label="2MHD"></el-radio-button> -->
+            </el-radio-group>
+          </div>
+          <div style="margin-top: 20px">
+            <el-radio-group v-model="configInfo.resolution" @change="setconfig">
+              <el-radio-button label="分辨率" disabled></el-radio-button>
+              <el-radio-button label="2002_0">1080P</el-radio-button>
+              <el-radio-button label="2002_1">720P</el-radio-button>
+              <el-radio-button label="2002_2">WVGA</el-radio-button>
+            </el-radio-group>
+          </div>
+          <div style="margin-top: 20px">
+            <el-radio-group v-model="configInfo.looprecording" @change="setconfig">
+              <el-radio-button label="循环录制" disabled></el-radio-button>
+              <el-radio-button label="2003_0">OFF</el-radio-button>
+              <el-radio-button label="2003_1">1MIN</el-radio-button>
+              <el-radio-button label="2003_2">3MIN</el-radio-button>
+              <el-radio-button label="2003_3">5MIN</el-radio-button> 
+            </el-radio-group>
+          </div>
+          <div style="margin-top: 20px">
+            <el-radio-group>
+              <el-radio-button label="WDR" disabled></el-radio-button>
+            </el-radio-group>
+            <el-switch v-model="configInfo.wdr" active-value='2004_1' inactive-value='2004_0' active-text="开"  @change="setconfig"></el-switch>
+          </div>
+          <div style="margin-top: 20px">
+            <el-radio-group>
+              <el-radio-button label="曝光" disabled></el-radio-button>
+            </el-radio-group>
+            <!-- <el-input-number v-model="configInfo.exposure" :precision="2" :step-strictly=true :step="0.33" :min="-2" :max="2"></el-input-number> -->
+            <el-select v-model="configInfo.exposure"  @change="setexposureconfig">
+              <el-option
+                v-for="item in configInfo.options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </div>
+          <div style="margin-top: 20px">
+            <el-radio-group>
+              <el-radio-button label="运动检测" disabled></el-radio-button>
+            </el-radio-group>
+            <el-switch v-model="configInfo.montiondetec"  active-value='2006_1' inactive-value='2006_0' @change="setconfig" active-text="开"></el-switch>
+          </div>
+          <div style="margin-top: 20px">
+            <!-- <el-radio-group v-model="configInfo.looprecording"> -->
+              <el-radio-button label="是否录音" disabled></el-radio-button>
+            <!-- </el-radio-group> -->
+            <el-switch v-model="configInfo.recordaudio" active-value='2007_1' inactive-value='2007_0' @change="setconfig" active-text="开"></el-switch>
+          </div>
+          <div style="margin-top: 20px">
+            <!-- <el-radio-group v-model="configInfo.looprecording"> -->
+              <el-radio-button label="视频添加时间" disabled></el-radio-button>
+            <!-- </el-radio-group> -->
+            <el-switch v-model="configInfo.datestamp" active-value='2008_1' inactive-value='2008_0' @change="setconfig" active-text="开"></el-switch>
+          </div>
+          <div style="margin-top: 20px">
+            <el-radio-group v-model="configInfo.gsensor">
+              <el-radio-button label="碰撞灵敏度" disabled></el-radio-button>
+              <el-radio-button label="2011_0">关</el-radio-button>
+              <el-radio-button label="2011_1">低</el-radio-button>
+              <el-radio-button label="2011_2">中</el-radio-button>
+              <el-radio-button label="2011_3">高</el-radio-button>
+              <!-- <el-radio-button label="2MHD"></el-radio-button> -->
+            </el-radio-group>
+          </div>
+          <div style="margin-top: 20px">
+            <el-radio-group v-model="configInfo.tvmode">
+              <el-radio-button label="电视模式" disabled></el-radio-button>
+              <el-radio-button label="3009_0">NTSC</el-radio-button>
+              <el-radio-button label="3009_1">PAL</el-radio-button>
+            </el-radio-group>
+          </div>
+          <div style="margin-top: 20px">
+            <el-radio-group v-model="configInfo.vidfre">
+              <el-radio-button label="录制频率" disabled></el-radio-button>
+              <el-radio-button label="8114_0">50HZ</el-radio-button>
+              <el-radio-button label="8114_1">60HZ</el-radio-button>
+            </el-radio-group>
+          </div>                     
         </div>
-      </el-row>
-    
+      </el-tab-pane>
+    </el-tabs>
     <!-- <button @click="wzd"></button> -->
   </div>
 </template>
@@ -40,6 +139,7 @@ export default {
   name: 'HelloWorld',
   data () {
     return {
+      activeName: 'myvideo',
       msg: 'Maxto M3',
       timer: '',
       videoInfos: [],
@@ -49,7 +149,7 @@ export default {
               autoplay: false, //如果true,浏览器准备好时开始回放。
               muted: false, // 默认情况下将会消除任何音频。
               loop: false, // 导致视频一结束就重新开始。
-              preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
+              preload: 'metadata', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
               language: 'zh-CN',
               aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
               fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
@@ -70,20 +170,85 @@ export default {
                 remainingTimeDisplay: false,
                 fullscreenToggle: true  //全屏按钮
               }
-        }
+      },
+      cmdNum:{
+        '1002' : 'phonesize',
+        '2002' : 'resolution',
+        '2003' : 'looprecording',
+        '2004' : 'wdr',
+        '2005' : 'exposure',
+        '2006' : 'montiondetec',
+        '2007' : 'recordaudio',
+        '2008' : 'datestamp',
+        '2011' : 'gsensor',
+        '3009' : 'tvmode',
+        '8114' : 'vidfre'
+      },
+      configInfo : {
+        phonesize : '5M',
+        resolution: '1080P',
+        looprecording: '5MIN',
+        wdr:true,
+        montiondetec: true,
+        recordaudio:true,
+        datestamp: true,
+        gsensor: '低',
+        tvmode: 'NTSC',
+        vidfre: '50HZ',
+        options: [{
+          value: 0,
+          label: '+2.0'
+        }, {
+          value: 1,
+          label: '+5/3'
+        }, {
+          value: 2,
+          label: '+4/3'
+        }, {
+          value: 3,
+          label: '+1.0'
+        }, {
+          value: 4,
+          label: '+2/3'
+        },{
+          value: 5,
+          label: '+1/3'
+        }, {
+          value: 6,
+          label: '+0.0'
+        }, {
+          value: 7,
+          label: '-1/3'
+        }, {
+          value: 8,
+          label: '-2/3'
+        }, {
+          value: 9,
+          label: '-1.0'
+        },{
+          value: 10,
+          label: '-4/3'
+        }, {
+          value: 11,
+          label: '-5/3'
+        }, {
+          value: 12,
+          label: '-2.0'
+        }],
+        exposure:0,
+        value: 5
+      }
     }    
   },
   mounted() {
     this.getVideo()
-    var x2json = new x2js()
-    var xmlText = "<MyRoot><test>Success</test><test2><item>val1</item><item>val2</item></test2></MyRoot>";
-    var jsonObj =  x2json.xml2js( xmlText )
-    console.log('jsonobg ',jsonObj)
-    console.log('this is current player instance object', this.videoPlayer)
     setTimeout(() => {
       console.log('dynamic change options')
     }, 1000)
-    this.timer = setInterval(this.m3heartbeat,5000)
+    this.timer = setInterval(this.m3heartbeat,10000)
+    // var wzd = setInterval(()=>{
+    //   console.log(this.configInfo.wdr)
+    // },1000)
   },
   beforeDestroy() {
       clearInterval(this.timer);
@@ -92,6 +257,49 @@ export default {
     videoPlayer
   },
   methods:{
+    transformObject(keyArr,valueArr) {
+      var obj = {}
+      keyArr.map( (v,i) => {
+          obj[keyArr[i]] = valueArr[i]
+      })
+      return obj
+    },
+    setexposureconfig(value){
+        var setcofurl = '/?custom=1&cmd=' + 2004 + '&par=' + value
+        this.axios.get(setcofurl)
+        .then( res => {
+            var x2json = new x2js()
+            var jsondata = x2json.xml2js(res.data)
+            console.log('----conf json data----', JSON.stringify(jsondata))       
+          }
+        ).catch( res => {
+          console.log('set config errors are ', res)
+        })
+    },
+    setconfig(value){
+      console.log(value)
+      // http://192.168.1.254/?custom=1&cmd=2001&par=1
+      var cmdpar = value.split('_')
+      var setcofurl = '/?custom=1&cmd=' + cmdpar[0] + '&par=' + cmdpar[1]
+      console.log(cmdpar,setcofurl)
+      this.axios.get(setcofurl)
+      .then( res => {
+          var x2json = new x2js()
+          var jsondata = x2json.xml2js(res.data)
+          console.log('----conf json data----', JSON.stringify(jsondata))       
+        }
+      ).catch( res => {
+        console.log('set config errors are ', res)
+      })
+    },
+    handleClick(tab, event) {
+      console.log(tab, event);
+      console.log("display table name",tab.name)
+      if (tab.name == 'configmanage') {
+        // this.getConfig()
+        this.getsaveConfig()
+      }
+    },
     m3heartbeat(){
       // 感觉抓包的时候,这个显示的是心跳请求
       console.log('heartbeat is ok')
@@ -103,19 +311,60 @@ export default {
     wzd(playevent){
       console.log('clicked wzd ')
     },
+    getsaveConfig(){
+      this.axios.get('/?custom=1&cmd=3014')
+      // this.axios.get('saveconfig.xml')
+      .then( res => {
+          var x2json = new x2js()
+          var jsondata = x2json.xml2js(res.data)
+          console.log('----conf json data----', JSON.stringify(jsondata))
+          var configval = this.transformObject(jsondata.Function.Cmd,jsondata.Function.Status)
+          console.log('configval is ',configval)
+          console.log('---------------------')
+          console.log( JSON.stringify(this.configInfo))
+          for(var key in configval){
+            // console.log(key,configval[key])
+
+            if (key == '2005') {
+              this.configInfo[this.cmdNum[key]] =  parseInt(configval[key])
+              continue
+            }
+            this.configInfo[this.cmdNum[key]] = key+'_'+configval[key]
+          }
+          console.log( JSON.stringify(this.configInfo))
+          // console.log('cmdnum is ',this.configInfo[this.cmdNum['1002']])
+          console.log('---------------------')
+        }
+      ).catch( res => {
+        console.log('getsave config errors are ', res)
+      })
+    },
+    getConfig(){
+      this.axios.get('/?custom=1&cmd=3031&str=all')
+      // this.axios.get('config.xml')
+      .then( res => {
+          console.log('config is ',res)
+          var x2json = new x2js()
+          var jsondata = x2json.xml2js( res.data )
+          console.log('----conf json data----', JSON.stringify(jsondata))
+        }
+      ).catch( res => {
+        console.log('erros is ', res)
+      })
+    },
     getVideo(){
       // /Users/aurora/Desktop/下载.xml 文件 为本地保存的文件 便于调试 
       // 另外由于使用node的代理,来进行请求操作
       // 其中 npm run dev 直接请求本地的/Users/aurora/Desktop/下载.xml  
       // npm run build 编译的文件直接会代理到m3 并且需要更改为请求命令this.axios.get('/?custom=1&cmd=3015')
       //我觉得基本说清楚了
-      this.axios.get('%E4%B8%8B%E8%BD%BD.xml')
-      // this.axios.get('/?custom=1&cmd=3015')
+      // this.axios.get('%E4%B8%8B%E8%BD%BD.xml')
+      this.axios.get('/?custom=1&cmd=3015')
       .then( res => {
           console.log("right is ",res)
           var x2json = new x2js()
           var jsondata =  x2json.xml2js( res.data )
-          // console.log(JSON.stringify(jsondata.LIST.ALLFile))
+          console.log(JSON.stringify(jsondata.LIST.ALLFile))
           for (let index = 0; index < jsondata.LIST.ALLFile.length; index++) {
             const element = jsondata.LIST.ALLFile[index].File;
             console.log(element)
@@ -141,7 +390,7 @@ export default {
               autoplay: false, //如果true,浏览器准备好时开始回放。
               muted: false, // 默认情况下将会消除任何音频。
               loop: false, // 导致视频一结束就重新开始。
-              preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
+              preload: 'metadata', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
               language: 'zh-CN',
               aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
               fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
