@@ -2,8 +2,7 @@
 
 > watch m3 video
 
-下载客户端链接:
-https://github.com/jdwang001/maxto-m3/releases/tag/v1.0
+[客户端下载链接](https://github.com/jdwang001/maxto-m3/releases/tag/v1.0)
 
 fix:
 1.增加了删除选项
